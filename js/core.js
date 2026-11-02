@@ -125,6 +125,33 @@
     }
   }
 
+  /* Space 的 /mac/usage 返回的记录没有费用，这里按 MODELS 的价格补上 */
+  function fromUsage(list) {
+    if (!Array.isArray(list)) return [];
+    return list.map(function (raw) {
+      if (!raw || typeof raw !== 'object') return null;
+      var cost = calcCost(raw.model, raw.promptTokens, raw.completionTokens).total;
+      var copy = {};
+      Object.keys(raw).forEach(function (k) { copy[k] = raw[k]; });
+      copy.cost = cost;
+      return normalizeRecord(copy);
+    }).filter(function (r) { return r !== null && r.totalTokens > 0; });
+  }
+
+  /* 把新记录合进旧记录，id 重复的跳过；返回新增条数 */
+  function mergeRecords(existing, incoming) {
+    var seen = {};
+    existing.forEach(function (r) { seen[r.id] = true; });
+    var added = 0;
+    incoming.forEach(function (r) {
+      if (seen[r.id]) return;
+      seen[r.id] = true;
+      existing.push(r);
+      added += 1;
+    });
+    return added;
+  }
+
   function aggregate(records) {
     var out = { count: 0, promptTokens: 0, completionTokens: 0, totalTokens: 0, cost: 0 };
     (records || []).forEach(function (r) {
@@ -250,6 +277,8 @@
     normalizeRecord: normalizeRecord,
     normalizeRecords: normalizeRecords,
     parseStore: parseStore,
+    fromUsage: fromUsage,
+    mergeRecords: mergeRecords,
     aggregate: aggregate,
     dayKey: dayKey,
     startOfDay: startOfDay,

@@ -301,3 +301,9 @@ td.time { color: var(--muted); }
   .panel { border: 1px solid #ccc; }
   .tools, .range, #record-form, #estimate-form, .del { display: none !important; }
 }
+
+.sync-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
