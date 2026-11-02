@@ -1,0 +1,303 @@
+/* Token 消耗记录 —— 纯静态页面样式，移动端优先 */
+:root {
+  --bg: #0f1420;
+  --panel: #171e2e;
+  --panel-2: #1f2940;
+  --line: #2b364f;
+  --text: #e8edf7;
+  --muted: #93a0bb;
+  --accent: #4ade80;
+  --accent-dim: #1d7a4a;
+  --danger: #f87171;
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.site-header {
+  padding: 22px 16px 10px;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.site-header h1 {
+  margin: 0 0 6px;
+  font-size: 24px;
+  letter-spacing: 0.5px;
+}
+
+.sub {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 8px 16px 64px;
+  display: grid;
+  /* minmax(0,1fr) 防止宽表格把整页撑出屏幕 */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  /* grid 子项默认 min-width:auto，宽表格会让面板撑破视口 */
+  min-width: 0;
+}
+
+.panel h2 {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.panel-head h2 { margin: 0; }
+
+.range {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.range button {
+  background: var(--panel-2);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.range button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #06231a;
+  font-weight: 600;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.card {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.card-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.card strong {
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  word-break: break-all;
+}
+
+.card.accent strong { color: var(--accent); }
+
+.hint {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 10px 0 0;
+}
+
+.chart-wrap { margin-top: 14px; }
+
+.chart-fallback {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.grid-2 {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+
+form {
+  display: grid;
+  gap: 10px;
+}
+
+label {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+input, select {
+  width: 100%;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-size: 15px;
+  font-family: inherit;
+}
+
+input:focus, select:focus {
+  outline: 2px solid var(--accent-dim);
+  outline-offset: 1px;
+  border-color: var(--accent-dim);
+}
+
+.btn {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btn:hover { border-color: var(--muted); }
+
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #06231a;
+  font-weight: 600;
+}
+
+.btn.small {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.btn.danger { color: var(--danger); border-color: #6b2a34; }
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.file-btn { display: inline-flex; align-items: center; }
+
+.preview, .estimate-out {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.estimate-out strong { color: var(--accent); font-size: 15px; }
+
+.error {
+  color: var(--danger);
+  font-size: 13px;
+  margin: 0;
+}
+
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+th { color: var(--muted); font-weight: 500; font-size: 12px; }
+
+th.num, td.num { text-align: right; }
+
+tbody tr:hover { background: var(--panel-2); }
+
+td.time { color: var(--muted); }
+
+.del {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px 6px;
+}
+
+.del:hover { color: var(--danger); }
+
+.empty {
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+  padding: 18px 0 6px;
+  margin: 0;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  background: #0b1220;
+  border: 1px solid var(--line);
+  color: var(--text);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  max-width: 90vw;
+  z-index: 20;
+  /* 提示条不挡点击 */
+  pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+@media (min-width: 720px) {
+  .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .site-header { padding-top: 28px; }
+  .site-header h1 { font-size: 28px; }
+}
+
+@media print {
+  body { background: #fff; color: #000; }
+  .panel { border: 1px solid #ccc; }
+  .tools, .range, #record-form, #estimate-form, .del { display: none !important; }
+}

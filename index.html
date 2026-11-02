@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token 消耗记录</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <h1>Token 消耗记录</h1>
+  <p class="sub">记录每次调用用了多少 token、花了多少钱。数据只存在你自己的浏览器里，不上传任何服务器。</p>
+</header>
+
+<main>
+  <section class="panel">
+    <div class="panel-head">
+      <h2>概览</h2>
+      <div class="range" id="range" role="group" aria-label="时间范围">
+        <button type="button" data-days="7" class="active">近 7 天</button>
+        <button type="button" data-days="30">近 30 天</button>
+        <button type="button" data-days="90">近 90 天</button>
+        <button type="button" data-days="all">全部</button>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card"><span class="card-label">输入 tokens</span><strong id="stat-prompt">0</strong></div>
+      <div class="card"><span class="card-label">输出 tokens</span><strong id="stat-completion">0</strong></div>
+      <div class="card"><span class="card-label">合计 tokens</span><strong id="stat-total">0</strong></div>
+      <div class="card accent"><span class="card-label">费用</span><strong id="stat-cost">¥0.00</strong></div>
+    </div>
+    <p class="hint" id="stat-count">共 0 条记录</p>
+
+    <div class="chart-wrap">
+      <canvas id="chart" height="220" aria-label="每日 token 趋势图" role="img"></canvas>
+      <p class="chart-fallback" id="chart-fallback" hidden>图表库加载失败（可能没联网），数据统计仍可正常使用。</p>
+    </div>
+  </section>
+
+  <div class="grid-2">
+    <section class="panel">
+      <h2>添加一条记录</h2>
+      <form id="record-form" novalidate>
+        <label>模型
+          <select id="f-model"></select>
+        </label>
+        <label>输入 tokens
+          <input id="f-prompt" type="number" min="0" step="1" inputmode="numeric" placeholder="例如 1200" required>
+        </label>
+        <label>输出 tokens
+          <input id="f-completion" type="number" min="0" step="1" inputmode="numeric" placeholder="例如 300" required>
+        </label>
+        <p class="preview" id="form-preview">费用估算：¥0.00</p>
+        <button type="submit" class="btn primary">保存记录</button>
+        <p class="error" id="form-error" hidden></p>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>费用估算</h2>
+      <p class="hint">不保存，只算给你看。</p>
+      <form id="estimate-form" novalidate>
+        <label>模型
+          <select id="e-model"></select>
+        </label>
+        <label>输入 tokens
+          <input id="e-prompt" type="number" min="0" step="1" inputmode="numeric" value="1000">
+        </label>
+        <label>输出 tokens
+          <input id="e-completion" type="number" min="0" step="1" inputmode="numeric" value="500">
+        </label>
+        <div class="estimate-out" id="estimate-out">输入 ¥0.00 + 输出 ¥0.00 = <strong>¥0.00</strong></div>
+        <button type="submit" class="btn">重新计算</button>
+      </form>
+    </section>
+  </div>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>记录明细</h2>
+      <div class="tools">
+        <button type="button" class="btn small" id="export-csv">导出 CSV</button>
+        <button type="button" class="btn small" id="export-pdf">导出 PDF</button>
+        <button type="button" class="btn small" id="export-json">备份 JSON</button>
+        <label class="btn small file-btn">导入 JSON
+          <input type="file" id="import-json" accept="application/json,.json" hidden>
+        </label>
+        <button type="button" class="btn small danger" id="clear-all">清空</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>时间</th><th>模型</th><th class="num">输入</th><th class="num">输出</th><th class="num">合计</th><th class="num">费用</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+      <p class="empty" id="empty-hint" hidden>还没有记录，先在上面添加一条。</p>
+    </div>
+  </section>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="js/core.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
