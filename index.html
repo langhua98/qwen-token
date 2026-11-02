@@ -45,13 +45,10 @@
         <button type="button" class="btn small primary" id="sync-now">立即同步</button>
       </div>
     </div>
-    <p class="hint">从 Hugging Face Space 读 <code>/mac/v1</code> 每次调用记下的 tokens，合并到下面的记录里（重复的自动跳过）。填好后每次打开页面会自动同步。</p>
+    <p class="hint">从 Hugging Face Space 读 <code>/mac/v1</code> 每次调用记下的 tokens，合并到下面的记录里（重复的自动跳过）。每次打开页面自动同步。</p>
     <form id="sync-form" class="sync-form" novalidate>
       <label>Space 地址
         <input id="sync-url" type="url" placeholder="https://langhua1998-douyin-proxy.hf.space" autocomplete="off">
-      </label>
-      <label>读取密钥（Space 的 USAGE_KEY，没设就是 LOCAL_LLM_API_KEY）
-        <input id="sync-key" type="password" autocomplete="off" placeholder="只存在这个浏览器里">
       </label>
     </form>
     <p class="hint" id="sync-status">还没同步过</p>
