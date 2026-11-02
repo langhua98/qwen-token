@@ -333,12 +333,11 @@
     var cfg = {};
     try { cfg = JSON.parse(localStorage.getItem(SYNC_KEY) || '{}') || {}; } catch (err) { cfg = {}; }
     el.syncUrl.value = cfg.url || DEFAULT_SPACE;
-    el.syncKey.value = cfg.key || '';
   }
 
   function saveSync() {
     try {
-      localStorage.setItem(SYNC_KEY, JSON.stringify({ url: el.syncUrl.value.trim(), key: el.syncKey.value.trim() }));
+      localStorage.setItem(SYNC_KEY, JSON.stringify({ url: el.syncUrl.value.trim() }));
     } catch (err) { /* 忽略 */ }
   }
 
@@ -348,18 +347,16 @@
 
   function syncNow(quiet) {
     var base = el.syncUrl.value.trim().replace(/\/+$/, '');
-    var key = el.syncKey.value.trim();
-    if (!base || !key) {
-      if (!quiet) toast('先填 Space 地址和读取密钥');
-      syncStatus('填好 Space 地址和读取密钥后就能同步');
+    if (!base) {
+      if (!quiet) toast('先填 Space 地址');
+      syncStatus('填好 Space 地址后就能同步');
       return;
     }
     saveSync();
     el.syncNow.disabled = true;
     syncStatus('同步中…（Space 休眠时第一次要等它醒来，可能要一两分钟）');
-    fetch(base + '/mac/usage', { headers: { Authorization: 'Bearer ' + key }, cache: 'no-store' })
+    fetch(base + '/mac/usage', { cache: 'no-store' })
       .then(function (res) {
-        if (res.status === 401) throw new Error('密钥不对');
         if (!res.ok) throw new Error('Space 返回 ' + res.status);
         return res.json();
       })
@@ -436,7 +433,6 @@
     el.syncNow.addEventListener('click', function () { syncNow(false); });
     el.syncForm.addEventListener('submit', function (e) { e.preventDefault(); syncNow(false); });
     el.syncUrl.addEventListener('change', saveSync);
-    el.syncKey.addEventListener('change', saveSync);
 
     el.exportCsv.addEventListener('click', exportCSV);
     el.exportPdf.addEventListener('click', exportPDF);
@@ -485,7 +481,6 @@
       toast: $('toast'),
       syncForm: $('sync-form'),
       syncUrl: $('sync-url'),
-      syncKey: $('sync-key'),
       syncNow: $('sync-now'),
       syncStatus: $('sync-status')
     };
@@ -500,7 +495,7 @@
     runEstimate();
     renderAll();
     loadSync();
-    if (el.syncKey.value) syncNow(true);
+    syncNow(true);
   }
 
   if (document.readyState === 'loading') {

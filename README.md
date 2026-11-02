@@ -18,7 +18,7 @@
 
 Mac 上 Ollama 跑的 qwen3.5:9b 经 HF Space 的 `/mac/v1` 调用时，Space 会把每次返回的 tokens 记下来（xiaoju-video 仓库 `streamer/mac_link.py`），从 `GET /mac/usage` 读出来。
 
-页面上「同步 Mac 本地模型用量」填 Space 地址（默认 `https://langhua1998-douyin-proxy.hf.space`）和读取密钥（Space 的 `USAGE_KEY`，没设就是 `LOCAL_LLM_API_KEY`），点「立即同步」。之后每次打开页面自动同步，重复的记录自动跳过，费用按下面的价格算。
+打开页面就自动同步（Space 地址默认 `https://langhua1998-douyin-proxy.hf.space`，可以在页面上改），也可以点「立即同步」。重复的记录自动跳过，费用按下面的价格算。
 
 只有 Space 部署了带 `/mac/usage` 的版本以后的调用才会被记下来，之前的用量拿不到。
 
