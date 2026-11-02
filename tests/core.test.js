@@ -139,3 +139,25 @@ test('格式化：大数字加千分位、极小费用不显示为 0', () => {
   assert.strictEqual(core.formatCost(0), '¥0.00');
   assert.strictEqual(core.formatNumber(NaN), '0');
 });
+
+test('同步：Space 的用量记录补上费用，坏数据丢掉', () => {
+  const list = core.fromUsage([
+    { id: 'm1', ts: 1700000000000, model: 'qwen3.5:9b', promptTokens: 1000000, completionTokens: 1000000 },
+    { id: 'm2', ts: 1700000000001, model: 'other', promptTokens: 10, completionTokens: 5 },
+    { id: 'm3', ts: 'bad', model: 'qwen3.5:9b', promptTokens: 1, completionTokens: 1 },
+    { id: 'm4', ts: 1700000000002, model: 'qwen3.5:9b', promptTokens: 0, completionTokens: 0 },
+    null
+  ]);
+  assert.deepStrictEqual(list.map((r) => r.id), ['m1', 'm2']);
+  assert.ok(Math.abs(list[0].cost - 0.2) < 1e-9);
+  assert.strictEqual(list[0].totalTokens, 2000000);
+  assert.strictEqual(list[1].cost, 0);
+  assert.deepStrictEqual(core.fromUsage(undefined), []);
+});
+
+test('同步：合并时 id 重复的跳过', () => {
+  const have = [{ id: 'a' }, { id: 'b' }];
+  const added = core.mergeRecords(have, [{ id: 'b' }, { id: 'c' }, { id: 'c' }]);
+  assert.strictEqual(added, 1);
+  assert.deepStrictEqual(have.map((r) => r.id), ['a', 'b', 'c']);
+});

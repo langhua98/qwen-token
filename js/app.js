@@ -5,6 +5,8 @@
   var core = window.TokenCore;
   var STORE_KEY = 'token-tracker.records.v1';
   var DAYS_KEY = 'token-tracker.days.v1';
+  var SYNC_KEY = 'token-tracker.sync.v1';
+  var DEFAULT_SPACE = 'https://langhua1998-douyin-proxy.hf.space';
   var state = { days: 7, records: [], chart: null };
 
   var el = {};
@@ -315,15 +317,7 @@
     reader.onload = function () {
       var incoming = core.parseStore(String(reader.result));
       if (incoming.length === 0) { toast('文件里没有可用的记录'); return; }
-      var seen = {};
-      state.records.forEach(function (r) { seen[r.id] = true; });
-      var added = 0;
-      incoming.forEach(function (r) {
-        if (seen[r.id]) return;
-        seen[r.id] = true;
-        state.records.push(r);
-        added += 1;
-      });
+      var added = core.mergeRecords(state.records, incoming);
       if (saveRecords()) {
         renderAll();
         toast('导入 ' + added + ' 条（重复的已跳过）');
@@ -331,6 +325,63 @@
     };
     reader.onerror = function () { toast('读取文件失败'); };
     reader.readAsText(file);
+  }
+
+  /* ---------- 同步 Space 上记下的用量 ---------- */
+
+  function loadSync() {
+    var cfg = {};
+    try { cfg = JSON.parse(localStorage.getItem(SYNC_KEY) || '{}') || {}; } catch (err) { cfg = {}; }
+    el.syncUrl.value = cfg.url || DEFAULT_SPACE;
+    el.syncKey.value = cfg.key || '';
+  }
+
+  function saveSync() {
+    try {
+      localStorage.setItem(SYNC_KEY, JSON.stringify({ url: el.syncUrl.value.trim(), key: el.syncKey.value.trim() }));
+    } catch (err) { /* 忽略 */ }
+  }
+
+  function syncStatus(msg) {
+    el.syncStatus.textContent = msg;
+  }
+
+  function syncNow(quiet) {
+    var base = el.syncUrl.value.trim().replace(/\/+$/, '');
+    var key = el.syncKey.value.trim();
+    if (!base || !key) {
+      if (!quiet) toast('先填 Space 地址和读取密钥');
+      syncStatus('填好 Space 地址和读取密钥后就能同步');
+      return;
+    }
+    saveSync();
+    el.syncNow.disabled = true;
+    syncStatus('同步中…（Space 休眠时第一次要等它醒来，可能要一两分钟）');
+    fetch(base + '/mac/usage', { headers: { Authorization: 'Bearer ' + key }, cache: 'no-store' })
+      .then(function (res) {
+        if (res.status === 401) throw new Error('密钥不对');
+        if (!res.ok) throw new Error('Space 返回 ' + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        var incoming = core.fromUsage(data && data.records);
+        var added = core.mergeRecords(state.records, incoming);
+        if (added > 0 && !saveRecords()) return;
+        renderAll();
+        var msg = '已同步：Space 上共 ' + incoming.length + ' 条，新增 ' + added + ' 条（' +
+          core.dayKey(new Date()) + ' ' + new Date().toTimeString().slice(0, 5) + '）';
+        syncStatus(msg);
+        if (!quiet || added > 0) toast(msg);
+      })
+      .catch(function (err) {
+        var why = err && err.message ? err.message : String(err);
+        if (why === 'Failed to fetch' || why.indexOf('NetworkError') >= 0 || why.indexOf('Load failed') >= 0) {
+          why = '连不上 Space（地址不对、Space 在休眠或还没部署带 /mac/usage 的版本）';
+        }
+        syncStatus('同步失败：' + why);
+        if (!quiet) toast('同步失败：' + why);
+      })
+      .then(function () { el.syncNow.disabled = false; });
   }
 
   /* ---------- 初始化 ---------- */
@@ -382,6 +433,11 @@
       node.addEventListener('change', function () { runEstimate(); });
     });
 
+    el.syncNow.addEventListener('click', function () { syncNow(false); });
+    el.syncForm.addEventListener('submit', function (e) { e.preventDefault(); syncNow(false); });
+    el.syncUrl.addEventListener('change', saveSync);
+    el.syncKey.addEventListener('change', saveSync);
+
     el.exportCsv.addEventListener('click', exportCSV);
     el.exportPdf.addEventListener('click', exportPDF);
     el.exportJson.addEventListener('click', exportJSON);
@@ -426,7 +482,12 @@
       exportJson: $('export-json'),
       importJson: $('import-json'),
       clearAll: $('clear-all'),
-      toast: $('toast')
+      toast: $('toast'),
+      syncForm: $('sync-form'),
+      syncUrl: $('sync-url'),
+      syncKey: $('sync-key'),
+      syncNow: $('sync-now'),
+      syncStatus: $('sync-status')
     };
 
     fillModelSelect(el.fModel);
@@ -438,6 +499,8 @@
     currentCostPreview();
     runEstimate();
     renderAll();
+    loadSync();
+    if (el.syncKey.value) syncNow(true);
   }
 
   if (document.readyState === 'loading') {
